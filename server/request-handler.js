@@ -62,25 +62,6 @@ const requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
 
-  //checks if the method and the url are a match if they aren't a match for a get or post case then the code will reach the the error message
-  // if (request.method === 'GET' && request.url === '/classes/messages') {
-  //   response.writeHead(200, headers);
-  //   response.end(JSON.stringify(messages));
-  // } else if (request.method === 'POST' && request.url === '/classes/messages') {
-  //   request.on('data', chunk => {
-  //     messages.push(JSON.parse(chunk.toString()));
-  //   });
-  //   request.on('end', () => {
-  //     console.log('--> request done');
-  //     response.writeHead(201, headers);
-  //     response.end('All done');
-  //   });
-  // } else if (request.url !== '/classes/messages') {
-  //   response.writeHead(404, headers);
-  //   response.end('ERROR: 404');
-  // }
-
-
   let failedRequest = false; // boolean statement if any of the request or url is broken
 
   if (request.method === 'GET') { // check if method is GET

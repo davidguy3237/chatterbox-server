@@ -147,5 +147,51 @@ describe('THESE ARE EXTRA TESTS', function() {
     expect(res._ended).to.equal(true);
   });
 
+  it('Should handle multiple messages', function() {
+    var stubMsg1 = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg1);
+    var res = new stubs.response();
 
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+    var stubMsg2 = {
+      username: 'David',
+      text: 'Do my bidding! PART TWO'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg2);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+    var stubMsg3 = {
+      username: 'Michael',
+      text: 'Do my bidding! PART THREE'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg3);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data);
+    expect(messages.length).to.be.above(2);
+    expect(messages[messages.length - 1].username).to.equal('Michael');
+    expect(messages[messages.length - 1].text).to.equal('Do my bidding! PART THREE');
+    expect(res._ended).to.equal(true);
+  });
 });
