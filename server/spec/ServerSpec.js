@@ -94,7 +94,7 @@ describe('Node Server Request Listener Function', function() {
 });
 
 describe('THESE ARE EXTRA TESTS', function() {
-  it('should return an array of objects', function() {
+  it('Should update an existing message', function() {
     var stubMsg = {
       username: 'Jono',
       text: 'Do my bidding!'
@@ -118,6 +118,34 @@ describe('THESE ARE EXTRA TESTS', function() {
     expect(messages[0].username).to.equal('Jono');
     expect(messages[0].text).to.equal('Do my bidding!');
     expect(res._ended).to.equal(true);
-    expect(typeof messages[0]).to.equal('object');
+
+    // Updating message
+    let messageID = messages[0].message_id;
+    let editMessage = {
+      message_id: messageID,
+      newText: 'Do my bidding! UPDATED'
+    };
+    let updateReq = new stubs.request('/classes/messages', 'PATCH', editMessage);
+    let updateRes = new stubs.response();
+
+    handler.requestHandler(updateReq, updateRes);
+
+    expect(updateRes._responseCode).to.equal(201);
+
+    // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data);
+    expect(messages.length).to.be.above(0);
+    expect(messages[0].username).to.equal('Jono');
+    expect(messages[0].message_id).to.equal(messageID);
+    expect(messages[0].text).to.equal('Do my bidding! UPDATED');
+    expect(res._ended).to.equal(true);
   });
+
+
 });

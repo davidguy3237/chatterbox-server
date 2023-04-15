@@ -88,7 +88,6 @@ const requestHandler = function(request, response) {
     if (request.url === '/classes/messages') { // if url is /classes/messages send messages back
       response.writeHead(200, headers);
       response.end(JSON.stringify(messages));
-      console.log('---> messages: ', messages);
     } else { // if url is broken, then it's a failed request
       failedRequest = true;
     }
@@ -109,6 +108,23 @@ const requestHandler = function(request, response) {
       });
     } else { // if url is broken, then it's a failed request
       failedRequest = true;
+    }
+
+  } else if (request.method === 'PATCH') {
+
+    if (request.url === '/classes/messages') {
+      let newData;
+      request.on('data', chunk => {
+        newData = JSON.parse(chunk.toString());
+        messages.forEach(message => {
+          if (message.message_id === newData.message_id) {
+            message.text = newData.newText;
+          }
+        });
+      }).on('end', () => {
+        response.writeHead(201, headers);
+        response.end(JSON.stringify(messages));
+      });
     }
 
   } else if (request.method === 'OPTIONS') { // if method is broken or wrong, then it's a failed request
