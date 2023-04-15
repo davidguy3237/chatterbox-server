@@ -25,6 +25,7 @@
     "chai": "^4.2.0",
     "eslint-config-hackreactor": "https://github.com/reactorcore/eslint-config-hackreactor",
     "mocha": "^8.2.1",
+    "nodemon": "^2.0.22",
     "request": "^2.88.2"
   }
 }

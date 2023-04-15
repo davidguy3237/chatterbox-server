@@ -54,7 +54,6 @@ const requestHandler = function(request, response) {
   const headers = defaultCorsHeaders;
 
   // Tell the client we are sending them plain text.
-  //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   // headers['Content-Type'] = 'text/plain';
@@ -63,21 +62,69 @@ const requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
 
-  if (request.method === 'GET' && request.url === '/classes/messages') {
-    response.writeHead(200, headers);
-    response.end(JSON.stringify(messages));
-  } else if (request.method === 'POST' && request.url === '/classes/messages') {
-    request.on('data', chunk => {
-      messages.push(JSON.parse(chunk.toString()));
-    });
-    request.on('end', () => {
-      console.log('--> request done');
-      response.writeHead(201, headers);
-      response.end('All done');
-    });
-  } else if (request.url !== '/classes/messages') {
+  //checks if the method and the url are a match if they aren't a match for a get or post case then the code will reach the the error message
+  // if (request.method === 'GET' && request.url === '/classes/messages') {
+  //   response.writeHead(200, headers);
+  //   response.end(JSON.stringify(messages));
+  // } else if (request.method === 'POST' && request.url === '/classes/messages') {
+  //   request.on('data', chunk => {
+  //     messages.push(JSON.parse(chunk.toString()));
+  //   });
+  //   request.on('end', () => {
+  //     console.log('--> request done');
+  //     response.writeHead(201, headers);
+  //     response.end('All done');
+  //   });
+  // } else if (request.url !== '/classes/messages') {
+  //   response.writeHead(404, headers);
+  //   response.end('ERROR: 404');
+  // }
+
+
+  let failedRequest = false; // boolean statement if any of the request or url is broken
+
+  if (request.method === 'GET') { // check if method is GET
+
+    if (request.url === '/classes/messages') { // if url is /classes/messages send messages back
+      response.writeHead(200, headers);
+      response.end(JSON.stringify(messages));
+      console.log('---> messages: ', messages);
+    } else { // if url is broken, then it's a failed request
+      failedRequest = true;
+    }
+
+  } else if (request.method === 'POST') { // check if method is POST
+
+    if (request.url === '/classes/messages') { // if url is /classes/messages then add to messages
+      let data;
+      request.on('data', chunk => {
+        data = JSON.parse(chunk.toString());
+        data.message_id = Math.floor(Math.random() * 1000);
+        messages.push(data);
+      });
+      request.on('end', () => {
+        response.writeHead(201, headers);
+        response.end(JSON.stringify(data));
+      });
+    } else { // if url is broken, then it's a failed request
+      failedRequest = true;
+    }
+
+  } else if (request.method === 'OPTIONS') { // if method is broken or wrong, then it's a failed request
+
+    if (request.url === '/classes/messages') {
+      response.writeHead(200, headers);
+      response.end();
+    } else {
+      failedRequest = true;
+    }
+  } else {
+    failedRequest = true;
+  }
+
+  if (failedRequest) { //if the request failed, then run 404
     response.writeHead(404, headers);
-    response.end('ERROR: 404');
+    response.end();
   }
 
   // Make sure to always call response.end() - Node may not send
