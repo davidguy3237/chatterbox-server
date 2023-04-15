@@ -100,11 +100,12 @@ const requestHandler = function(request, response) {
       request.on('data', chunk => {
         data = JSON.parse(chunk.toString());
         data.message_id = Math.floor(Math.random() * 1000);
+        data.createdAt = new Date().toUTCString();
         messages.push(data);
       });
       request.on('end', () => {
         response.writeHead(201, headers);
-        response.end(JSON.stringify(data));
+        response.end(JSON.stringify(messages));
       });
     } else { // if url is broken, then it's a failed request
       failedRequest = true;
